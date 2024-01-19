@@ -202,6 +202,5 @@ def checkEncoder():
             
         
 while True:
-    #2Pの処理を書く際は、キー以外の変数を配列にし、引数で配列番号を指定して処理すること
      checkEncoder()
      checkButton()
