@@ -9,7 +9,7 @@ from adafruit_hid.keyboard import Keyboard, find_device
 from adafruit_hid.keycode import Keycode
 
 key_pins = [
-    board.GP2,# 1P
+    board.GP2,# 1P 0,1,は皿  2,3,4,5,6,7,8は鍵盤
     board.GP3,
     board.GP4,
     board.GP5,
@@ -20,9 +20,9 @@ key_pins = [
     board.GP10,
     board.GP11,
     board.GP12,
-    board.GP13,# 2P
+    board.GP13,# 2P 13,14,15,18,19,20,21が鍵盤
     board.GP14,
-    board.GP15,
+    board.GP15,# GP16、17は皿
     board.GP18,
     board.GP19,
     board.GP20,
@@ -83,8 +83,8 @@ from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard import Keycode
 
 # キーコード https://docs.circuitpython.org/projects/hid/en/4.1.6/api.html
-keyCodes = [[Keycode.Q,Keycode.W,Keycode.E,Keycode.R,Keycode.T,Keycode.Y,Keycode.U,Keycode.ENTER,Keycode.BACKSPACE,Keycode.P,Keycode.L,Keycode.K,Keycode.J],
-            [Keycode.H,Keycode.G,Keycode.F,Keycode.D,Keycode.S,Keycode.A,Keycode.Z,Keycode.ENTER,Keycode.BACKSPACE,Keycode.X,Keycode.C,Keycode.C,Keycode.C]]
+keyCodes = [Keycode.Q,Keycode.W,Keycode.E,Keycode.R,Keycode.T,Keycode.Y,Keycode.U,Keycode.ENTER,Keycode.BACKSPACE,Keycode.P,Keycode.L,Keycode.K,Keycode.J,
+             Keycode.H,Keycode.G,Keycode.F,Keycode.D,Keycode.S,Keycode.A,Keycode.Z,Keycode.ENTER,Keycode.BACKSPACE,Keycode.X,Keycode.C,Keycode.C,Keycode.C]
 scrUp = [Keycode.LEFT_SHIFT,Keycode.M]
 scrDown = [Keycode.CONTROL,Keycode.N]
 kbd = BitmapKeyboard(usb_hid.devices)
@@ -149,10 +149,11 @@ def changeMode():
             
     
 # プレイヤー番号は0スタート
-def checkButton(playerNum):
+# ここわざわざ引数にしなくてもいいかも
+def checkButton():
     ev = keys.events.get()
     if ev is not None:
-        key = keyCodes[playerNum][ev.key_number + playerNum * 11 ]
+        key = keyCodes[ev.key_number]
         if ev.pressed:
             kbd.press(key)
         else:
@@ -161,7 +162,7 @@ def checkButton(playerNum):
  
 
 def checkEncoder(playerNum):
-    global prePos,preCount,count,reactionCount,upRot,downRot,continuousRotCount,finalRotUp,rotAfterTheEndStop,stopAfterTheEndRot,notCountChangeTime
+    global prePos,preCount,count,reactionCount,upRot,downRot,finalRotUp,rotAfterTheEndStop,stopAfterTheEndRot,notCountChangeTime
     pos = encoder[playerNum].position
     cPos = pos - prePos[playerNum]
     moveDir = 0# 1下 -1上 0未回転 
@@ -227,26 +228,26 @@ def checkEncoder(playerNum):
             upRot[playerNum] = 0
             count[playerNum] = 0
             kbd.release(scrUp[playerNum])
-            continuousRotCount[playerNum] = 0
             
     elif downRot[playerNum] == 1:
-        reactionCount[playerNum] = reactionCountv + 1
+        reactionCount[playerNum] = reactionCount[playerNum]  + 1
         if reactionCount[playerNum] == REACTION_COUNT_MAX:# 一定時間経ったら回転中止
             reactionCount[playerNum] = 0
             downRot[playerNum] = 0
             count[playerNum] = 0
             kbd.release(scrDown[playerNum])
-            continuousRotCount[playerNum] = 0
             
         
 while True:
-    # 1P処理
+    # ボタン処理
+     checkButton()
+    
+    # 1P皿処理
      checkEncoder(0)
-     checkButton(0)
      
-     # 2P処理
+     # 2P皿処理
      checkEncoder(1)
-     checkButton(1)
      
      # モードの切替
      changeMode()
+
