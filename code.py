@@ -181,7 +181,8 @@ def checkEncoder(playerNum):
         if count[playerNum] < -COUNT_MAX:
             reactionCount[playerNum] = 0# 回したら反応時間をリセット
         
-        if count[playerNum] < -COUNT_MAX and rotAfterTheEndStop[playerNum] == 1 and finalRotUp[playerNum] == 1 or finalRotUp[playerNum] == 0 and count[playerNum] < -COUNT_MAX:# 条件満たしたら入力
+        #if count[playerNum] < -COUNT_MAX and rotAfterTheEndStop[playerNum] == 1 or finalRotUp[playerNum] == 0 and count[playerNum] < -COUNT_MAX:# 条件満たしたら入力
+        if count[playerNum] < -COUNT_MAX or finalRotUp[playerNum] == 0 and count[playerNum] < -COUNT_MAX:# 条件満たしたら入力
             downRot[playerNum] = 0 # 逆に回転していたら中止
             kbd.press(scrUp[playerNum])
             kbd.release(scrDown[playerNum])
@@ -198,7 +199,7 @@ def checkEncoder(playerNum):
         if count[playerNum] > COUNT_MAX:
             reactionCount[playerNum] = 0# 回したら反応時間をリセット
             
-        if count[playerNum] > COUNT_MAX and rotAfterTheEndStop[playerNum] == 1 and finalRotUp[playerNum] == 0 or finalRotUp[playerNum] == 1 and count[playerNum] > COUNT_MAX:
+        if count[playerNum] > COUNT_MAX and rotAfterTheEndStop[playerNum] == 1 or finalRotUp[playerNum] == 1 and count[playerNum] > COUNT_MAX:
             upRot[playerNum] = 0 # 逆に回転していたら中止
             kbd.press(scrDown[playerNum])
             kbd.release(scrUp[playerNum])
@@ -207,16 +208,15 @@ def checkEncoder(playerNum):
             finalRotUp[playerNum] = 0
             rotAfterTheEndStop[playerNum] = 0
             notCountChangeTime[playerNum] = 0
-            reactionCount[playerNum] = 0# 回したら反応時間をリセット
     
     prePos[playerNum] = pos
     
     if preCount[playerNum] == count[playerNum]:
-        notCountChangeTime[playerNum] = notCountChangeTime[playerNum] + 1
         if notCountChangeTime[playerNum] == NOT_COUNT_CHANGE_TIME_MAX:
-            notCountChangeTime[playerNum] = NOT_COUNT_CHANGE_TIME_MAX
+            notCountChangeTime[playerNum] = NOT_COUNT_CHANGE_TIME_MAX# ここはMAX代入で合ってます
             rotAfterTheEndStop[playerNum] = 1
-            count[playerNum] = 0
+        else:
+            notCountChangeTime[playerNum] = notCountChangeTime[playerNum] + 1
             
     preCount[playerNum] = count
      
