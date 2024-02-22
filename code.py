@@ -183,7 +183,6 @@ def checkEncoder(playerNum):
         count[playerNum] = count[playerNum] - 1
         if count[playerNum] < -COUNT_MAX:
             reactionCount[playerNum] = 0# 回したら反応時間をリセット
-            notCountChangeTime[playerNum] = 0
         
         #if count[playerNum] < -COUNT_MAX and rotAfterTheEndStop[playerNum] == 1 or finalRotUp[playerNum] == 0 and count[playerNum] < -COUNT_MAX:# 条件満たしたら入力
         if count[playerNum] < -COUNT_MAX and rotAfterTheEndStop or finalRotUp[playerNum] == 0 and count[playerNum] < -COUNT_MAX:# 条件満たしたら入力
@@ -193,6 +192,7 @@ def checkEncoder(playerNum):
             upRot[playerNum] = 1
             count[playerNum] = 0
             finalRotUp[playerNum] = 1
+            notCountChangeTime[playerNum] = 0
     # 下回転
     elif moveDir == 1:
         if count[playerNum] < 0:# マイナスだったら0を代入
@@ -200,7 +200,6 @@ def checkEncoder(playerNum):
         count[playerNum] = count[playerNum] + 1
         if count[playerNum] > COUNT_MAX:
             reactionCount[playerNum] = 0# 回したら反応時間をリセット
-            notCountChangeTime[playerNum] = 0
             
         if count[playerNum] > COUNT_MAX and rotAfterTheEndStop or finalRotUp[playerNum] == 1 and count[playerNum] > COUNT_MAX:
             upRot[playerNum] = 0 # 逆に回転していたら中止
@@ -209,6 +208,7 @@ def checkEncoder(playerNum):
             downRot[playerNum] = 1
             count[playerNum] = 0
             finalRotUp[playerNum] = 0
+            notCountChangeTime[playerNum] = 0
     
     prePos[playerNum] = pos
     preCount[playerNum] = count[playerNum]
