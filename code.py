@@ -116,8 +116,8 @@ rotAfterTheEndStop = [1,1]
 
 # 短時間で同一方向に入力できないようにする変数
 # 入力後に以下の変数の加算が開始し、notCountChangeTime == NOT_COUNT_CHANGE_TIME_MAXになったら同じ方向への入力が可能になる
-notCountChangeTime = [0,0]
 NOT_COUNT_CHANGE_TIME_MAX = 3500
+notCountChangeTime = [NOT_COUNT_CHANGE_TIME_MAX,NOT_COUNT_CHANGE_TIME_MAX]
     
 
 # IIDXモード
@@ -173,6 +173,9 @@ def checkEncoder(playerNum):
     else:
         moveDir = 0
           
+          
+    rotAfterTheEndStop = notCountChangeTime[playerNum] == 0
+    
     # 上回転
     if moveDir == -1: 
         if count[playerNum] > 0:# プラスだったら0を代入
@@ -180,17 +183,16 @@ def checkEncoder(playerNum):
         count[playerNum] = count[playerNum] - 1
         if count[playerNum] < -COUNT_MAX:
             reactionCount[playerNum] = 0# 回したら反応時間をリセット
+            notCountChangeTime[playerNum] = 0
         
         #if count[playerNum] < -COUNT_MAX and rotAfterTheEndStop[playerNum] == 1 or finalRotUp[playerNum] == 0 and count[playerNum] < -COUNT_MAX:# 条件満たしたら入力
-        if count[playerNum] < -COUNT_MAX or finalRotUp[playerNum] == 0 and count[playerNum] < -COUNT_MAX:# 条件満たしたら入力
+        if count[playerNum] < -COUNT_MAX and rotAfterTheEndStop or finalRotUp[playerNum] == 0 and count[playerNum] < -COUNT_MAX:# 条件満たしたら入力
             downRot[playerNum] = 0 # 逆に回転していたら中止
             kbd.press(scrUp[playerNum])
             kbd.release(scrDown[playerNum])
             upRot[playerNum] = 1
             count[playerNum] = 0
             finalRotUp[playerNum] = 1
-            rotAfterTheEndStop[playerNum] = 0
-            notCountChangeTime[playerNum] = 0
     # 下回転
     elif moveDir == 1:
         if count[playerNum] < 0:# マイナスだったら0を代入
@@ -198,44 +200,43 @@ def checkEncoder(playerNum):
         count[playerNum] = count[playerNum] + 1
         if count[playerNum] > COUNT_MAX:
             reactionCount[playerNum] = 0# 回したら反応時間をリセット
+            notCountChangeTime[playerNum] = 0
             
-        if count[playerNum] > COUNT_MAX and rotAfterTheEndStop[playerNum] == 1 or finalRotUp[playerNum] == 1 and count[playerNum] > COUNT_MAX:
+        if count[playerNum] > COUNT_MAX and rotAfterTheEndStop or finalRotUp[playerNum] == 1 and count[playerNum] > COUNT_MAX:
             upRot[playerNum] = 0 # 逆に回転していたら中止
             kbd.press(scrDown[playerNum])
             kbd.release(scrUp[playerNum])
             downRot[playerNum] = 1
             count[playerNum] = 0
             finalRotUp[playerNum] = 0
-            rotAfterTheEndStop[playerNum] = 0
-            notCountChangeTime[playerNum] = 0
     
     prePos[playerNum] = pos
-    
-    if preCount[playerNum] == count[playerNum]:
-        if notCountChangeTime[playerNum] == NOT_COUNT_CHANGE_TIME_MAX:
-            notCountChangeTime[playerNum] = NOT_COUNT_CHANGE_TIME_MAX# ここはMAX代入で合ってます
-            rotAfterTheEndStop[playerNum] = 1
-        else:
-            notCountChangeTime[playerNum] = notCountChangeTime[playerNum] + 1
-            
-    preCount[playerNum] = count
+    preCount[playerNum] = count[playerNum]
      
     # 回転時間加算と回転入力終了処理
     if upRot[playerNum] == 1:
-        reactionCount[playerNum] = reactionCount[playerNum] + 1
         if reactionCount[playerNum] == REACTION_COUNT_MAX:# 一定時間経ったら回転中止
             reactionCount[playerNum] = 0
-            upRot[playerNum] = 0
-            count[playerNum] = 0
             kbd.release(scrUp[playerNum])
+        else:
+            reactionCount[playerNum] = reactionCount[playerNum] + 1
+        if notCountChangeTime[playerNum] == NOT_COUNT_CHANGE_TIME_MAX:
+            upRot[playerNum] = 0
+            notCountChangeTime[playerNum] = 0
+        else:
+             notCountChangeTime[playerNum] =  notCountChangeTime[playerNum] + 1
             
     elif downRot[playerNum] == 1:
-        reactionCount[playerNum] = reactionCount[playerNum]  + 1
         if reactionCount[playerNum] == REACTION_COUNT_MAX:# 一定時間経ったら回転中止
             reactionCount[playerNum] = 0
-            downRot[playerNum] = 0
-            count[playerNum] = 0
             kbd.release(scrDown[playerNum])
+        else:
+            reactionCount[playerNum] = reactionCount[playerNum] + 1
+        if notCountChangeTime[playerNum] == NOT_COUNT_CHANGE_TIME_MAX:
+            downRot[playerNum] = 0
+            notCountChangeTime[playerNum] = 0
+        else:
+             notCountChangeTime[playerNum] =  notCountChangeTime[playerNum] + 1
             
         
 while True:
