@@ -116,7 +116,7 @@ rotAfterTheEndStop = [1,1]
 
 # 短時間で同一方向に入力できないようにする変数
 # 入力後に以下の変数の加算が開始し、notCountChangeTime == NOT_COUNT_CHANGE_TIME_MAXになったら同じ方向への入力が可能になる
-NOT_COUNT_CHANGE_TIME_MAX = 3500
+NOT_COUNT_CHANGE_TIME_MAX = 3000
 notCountChangeTime = [NOT_COUNT_CHANGE_TIME_MAX,NOT_COUNT_CHANGE_TIME_MAX]
     
 
